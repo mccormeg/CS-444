@@ -1,0 +1,240 @@
+\documentclass[onecolumn, draftclsnofoot,10pt, compsoc]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{setspace}
+
+
+\usepackage{geometry}
+\geometry{textheight=9.5in, textwidth=7in}
+\include{pygments.tex}
+
+%pull in the necessary preamble matter for pygments output
+\input{pygments.tex}
+
+
+% 1. Fill in these details
+\def \CapstoneTeamName{		The Cleverly Named Team}
+\def \CapstoneTeamNumber{		Spring 2018}
+\def \GroupMemberOne{			Megan McCormick}
+%\def \GroupMemberTwo{			Thomas Kuhn}
+%\def \GroupMemberThree{			Karl Popper}
+\def \CapstoneProjectName{		Final Writing Assignment}
+\def \CapstoneSponsorCompany{	Cheap Robots, Inc}
+\def \CapstoneSponsorPerson{		Roger Bacon}
+
+% 2. Uncomment the appropriate line below so that the document type works
+\def \DocType{		%Problem Statement
+				%Requirements Document
+				%Technology Review
+				%Design Document
+				%Progress Report
+        Writing Asignment
+				}
+			
+\newcommand{\NameSigPair}[1]{\par
+\makebox[2.75in][r]{#1} \hfil 	\makebox[3.25in]{\makebox[2.25in]{\hrulefill} \hfill		\makebox[.75in]{\hrulefill}}
+\par\vspace{-12pt} \textit{\tiny\noindent
+\makebox[2.75in]{} \hfil		\makebox[3.25in]{\makebox[2.25in][r]{Signature} \hfill	\makebox[.75in][r]{Date}}}}
+% 3. If the document is not to be signed, uncomment the RENEWcommand below
+\renewcommand{\NameSigPair}[1]{#1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\begin{titlepage}
+    \pagenumbering{gobble}
+    \begin{singlespace}
+    	%\includegraphics[height=4cm]{coe_v_spot1}
+        \hfill 
+        % 4. If you have a logo, use this includegraphics command to put it on the coversheet.
+        %\includegraphics[height=4cm]{CompanyLogo}   
+        \par\vspace{.2in}
+        \centering
+        \scshape{
+            \huge Operating Systems II \DocType \par
+            {\large\today}\par
+            \vspace{.5in}
+            \textbf{\Huge\CapstoneProjectName}\par
+            \vfill
+            %{\large Prepared for}\par
+           % \Huge \CapstoneSponsorCompany\par
+           % \vspace{5pt}
+            %{\Large\NameSigPair{\CapstoneSponsorPerson}\par}
+            %{\large Prepared by }\par
+            \CapstoneTeamNumber\par
+            % 5. comment out the line below this one if you do not wish to name your team
+           % \CapstoneTeamName\par 
+            \vspace{5pt}
+            {\Large
+                \NameSigPair{\GroupMemberOne}\par
+                %\NameSigPair{\GroupMemberTwo}\par
+                %\NameSigPair{\GroupMemberThree}\par
+            }
+            \vspace{20pt}
+        }
+       % \begin{abstract}
+        % 6. Fill in your abstract    
+        	%This document is written using one sentence per line.
+        	%This allows you to have sensible diffs when you use \LaTeX with version control, as well as giving a quick visual test to see if sentences are too short/long.
+        	%If you have questions, ``The Not So Short Guide to LaTeX'' is a great resource (\url{https://tobi.oetiker.ch/lshort/lshort.pdf})
+        %\end{abstract}     
+    \end{singlespace}
+\end{titlepage}
+\newpage
+\pagenumbering{arabic}
+%\tableofcontents
+% 7. uncomment this (if applicable). Consider adding a page break.
+%\listoffigures
+%\listoftables
+%\clearpage
+
+% 8. now you write!
+\section{Introduction}
+Understanding how operating systems work allow us as Engineers to test, stress, and improve the way an operating system runs for the better. Each operating system has a different way of executing the same instruction. To better our knowledge of how operating systems work this assignment will explain processes, threads, CPU scheduling,input and output, and memory management.This document will be explaining how Windows, Free BSD, and Linux utilize all of these components by giving small summaries of how each and then comparing those summaries against each other. 
+
+
+\section{Windows I/O}
+Windows goal was to make a sleek coverall for their I/O devices. This abstractive cover applied to both hardware and software applications. The different components that went into making this sleek abstraction are\cite{2}:
+\begin{itemize}
+  \item The I/O manager
+  \item Device drivers 
+  \item The PnP manager and bus driver (a type of device driver) 
+  \item The Power manager 
+  \item The Windows Driver Model also known as the WDM
+  \item The registry that holds a database of hardware devices
+  \item INF files that link hardware and driver files 
+  \item The hardware abstraction layer (or HAL) which is a bus driver for all other hardware that's connected to the motherboard 
+\end{itemize}
+Within the Windows operating system the I/O manager it's the heart of the I/O system. This is a packet driven system, and all requests are represented by an IRP also known as an I/O request packet. Each thread\cite{1} is run concurrently by creating an IRP of each I/O operation which selects the correct driver for the I/O device. When the packet is completed it is simply thrown away so that is doesn't stay in circulation of the IRP. A Windows system allows for asynchronous I/O this allows a system to be high-performance and run multiple I/O devices at once (hence running concurrently)\cite{3}.
+In Windows, each thread will perform I/O on virtual files. This could be any file on the virtual system like a directory or pipe. The Windows operating system will abstract all requests, the generalization of all applications allows the system to run more efficiently. The flow of a process is as follows:
+\begin{enumerate}
+  \item User-mode API
+  \item I/O system services API
+  \item I/O manager
+  \item Kernel-mode device drivers (With driver support)
+  \item HAL hardware access routines
+  \item Memory-mapped registers and DMA
+\end{enumerate}
+Windows processes must hold to this flow for the I/O applications to be executed correctly. These processes are executed with the help of drivers which can be in the form of device drivers, WDW drivers, or Layered drivers. Drivers have a certain structure to ensure that the are uniform, the drivers also help with his formality. Each driver of the Windows system is set up with the following\cite{3}:
+ \begin{itemize}
+  \item Initialization routine
+  \item Add-device routine 
+  \item Set I/O routine
+  \item Interrupt service routine (ISR)
+  \item Interrupt-servicing DPC routine
+  \item I/O completion routines
+  \item Cancel routine
+  \item Fast dispatch routines
+  \item Unload routine
+  \item System shutdown notification routine
+  \item Error-logging routine 
+\end{itemize}
+Windows also supports a variety of I/O. This can include requests, fast I/O, and more, however, many other operating systems also support these kinds of I/O\cite{3}.
+
+\section{Free BSD I/O}
+Unlike Windows free BSD uses descriptors to do all it's I/O processing. These descriptors are used in the kernel a long with the descriptor table. This table tells the kernel whether the device is a file entry or structure. FreeBSD supports data files by using vnode structures which are simply file systems in a certain structure to ensure that the I/O devices are processed correctly. However, with networking communications and other interprocess communications FreeBSD uses socket entries instead. These are another type of file system that is structured specifically for these purposes. A pipe is similar to a socket but is used for high speed communications that are local, pipes were established in place of sockets for these communications to make FreeBSD more efficient. Lastly, we see the use of fifo which is similar to pipes these are also used for high-speed communications however, these are specific to named communications or ones the operating system recognizes.Much like Windows FreeBSD supports asynchronous I/O. Like Windows this is implemented due to the efficiency bonus that is associated with it. An asynchronous approach allows the I/O processing to happen any time a device or application is activate/sent to the system. FreeBSD supports file-descriptor locking which many older Unix systems don't support. These systems are better by efficiently using CPU time, eliminating system crashes due to left over locks, and implementing superusers that can override almost all file permissions. FreeBSD isn't as concurrent as Windows but tries it's best by utilizing a multiplexing system on the I/O descriptors. This multiplexing allows data to come to the multiplexer at a single time all at once and get ported out in order as the multiplexer selects each set of information. FreeBSD however, also utilizes the simple for of single-driven I/O. This is like most simple I/O where a select, poll, and kevent is present and effect the the I/O process. When each I/O data bit is moved inside the kernel it takes the following structure known as the uio structure\cite{2}:
+\begin{enumerate}
+	\item APointer to the iovec array
+	\item Number of elements in the iovec array
+	\item File offset where operation should start
+	\item Sum lengths of the I/O vectors
+	\item Flag with source destination
+	\item Flag determining if the data is being copied
+	\item A pointer to the thread\cite{1} where data is described
+\end{enumerate}
+Within all FreeBSD operating systems all structures are described using either iovec or uio structures. However, things like read and write aren't passed to either structure due to it's special case\cite{2}.
+
+\section{I/O Comparision with Linux operation system}
+From a big picture view we can see that all I/O regardless of the operating system is based off of some sort of file system. Within a Linux system EVERYTHING is treated as a file. This makes it easy of the operation system to do operations because everything is accessed the same. With Linux almost everything is file I/O, the operating system functions on I/O more than anything else\cite{5}. As for Windows aagin we see the use of a file system for all the I/O. The biggest difference is that this file system is virtual, but they are still files. The operating system treats them as files as simply abstracts another information and keeps all specifics using file packets that hold each I/O devices information to be fetched while being executed\cite{3}. In FreeBSD we see something very similar, different file structures are used to organize all I/O devices and applications. Files can be differentiated using file descriptors and a descriptor table that the operating system uses to recognize each type of I/O. The biggest difference we can see form Windows is that instead of complete abstraction FreeBSD uses a few different processes for I/O applications and will pick the right process depending on the type of I/O\cite{2}. In the end we can see that I/O boils down to file input and output, execution and processing of these files.
+
+\section{Processes}
+What is a process? It is fundamentally defined as "an instance of a computer program that is being executed"\cite{4}. This could be thought of as a piece or unit of work for a program. However, how processes are run and what they consist of depends on the operating system.
+
+\subsection{Windows Processes}
+For windows there are several types of processes. The following system processes are on all windows machines\cite{2}:
+\begin{itemize}
+	\item Idle process
+	\item System process 
+	\item Session manager  
+	\item Local session manager 
+	\item Windows subsystem  
+	\item Session 0 initialization 
+	\item Logon process 
+	\item Service control manager 
+	\item Child service processes 
+	\item Local security authentication server 
+\end{itemize}
+Windows processes have a structure called executive process or EPROCESS. Each EPROCESS has threads which have their own data structures known as ETHREADS. When a Win32 program is executed windows has a parallel backwards compatible process structure called \texttt{CSR\_PROCESS} and utilizes W32PROCESS for kernel mode threading calls. \\
+Performing Process Initialization in the Context of the
+New Process
+
+\begin{enumerate}
+	\item Converting and Validating Parameters and Flags
+	\subitem In this step flags are checked against certain             circumstances to ensure the correct process is created with the correct tools. This could select the mode, the priority, and so on. If everything checks out the system tries to create the process to ensure no errors occur.
+	\item Opening the Image to Be Executed
+	\subitem The system finds to an image that can be executed for the processes. The image in run a tweaked until the system finds the optimal way to run the process and creates a section object.
+	\item Creating the Windows Executive Process Object 
+	\subitem This is done by creating a thread. Substages include: Setting up the EPROCESS object, creating an initial process address space, initializing the kernel process structure, setting up the PEB, and finishing the setup of the process address space.
+	\item Creating the Initial Thread and Its Stack and Context
+	\subitem Now the EPROCESS is set up but has no threads, it's time to make one. A thread is made and validated through sub processes and an initial thread is born.
+	\item Performing Windows Subsystem-Specific Post-Initialization
+	\subitem This is it, all the EPROCESS' and ETHREADs are created, time to finish initializing. The processes is tested to ensure it will run correctly and finalized for use.
+	\item Starting Execution of the Initial Thread
+	\subitem At this point the first thread is executed to run the process.
+	\item Performing Process Initialization in the Context of the New Process
+	\subitem The first thread is running and carries out the process. The process goes through a series of checks causing other sub processes and threads to start. Finally, the process will come to and end and the system will look to the next process.
+\end{enumerate}
+\subsection{FreeBSM Processes}
+Like Windows processes, FreeBSM process also contain one or more threads. The system schedules it's processes to seem concurrent by allowing multiple processes to run/execute. Just like Windows threads can occur in either user mode or kernal mode. The FreeBSM system utilizes a process structure and a thread structure, this is also similar to Windows, however, these are the only two main structures. For FreeBSM the process structure consists of the following\cite{1}:
+\begin{itemize}
+	\item Process identification: Known as the PID
+	\item Signal state: Signal actions and status 
+	\item Tracing: Tracing information of processes  
+	\item Timers: Real-time and CPU timers/counters
+\end{itemize}
+Process substructures include more information than that in a normal process structure.These processes rely heavily on their powerful threads to ensure they are executed correctly.
+\subsection{Linux Processes}
+Processes in Linux exist in only two forms, either they are Foreground processes that are used by a a user through terminal connection or they are background processes that need no user input and are not connected to the terminal. Some background processes are known as Daemons, these are processes that start with the system and run in the background forever. The unique thing about daemons in they don't die but can be controlled by the user. In Linux each process moves from state to state, either it was created, ready, running, waiting or terminated. A process will move between the three in the middle until it becomes terminated. To create processes in Linux a process makes an exact copy of itself but will have a different process ID. This can be done by using the system function which is very dangerous for security or by using the fork and exec functions. These alternative methods are fast, flexible, and secure. Linux sees processes based off of their process IDs, from these Linux identifies a process as either a parent or a child process\cite{5}.
+\subsection{Process Conclusion}
+We can see that FreeBSM and Linux processes are very similar. They both utilize fork/exec to create new processes. However, like Windows, Linux has a hierarchy or tree of processes. From the information collected I can safely say that Windows has the most detailed and advance setup for their processes, however, FreeBSM and Linux have a nice simple design making it much easier to follow. Windows and FreeBSM have more checks and balances to wait on when launching a process where Linux doesn't.
+
+\section{Threads}
+A thread is defined as "the smallest sequence of programmed instructions that can be managed independently by a scheduler, which is typically a part of the operating system"\cite{6}. Threads are often used in processes to move a process from state to state, as well as give a feeling of concurrency throughout a process.
+\subsection{Windows Threads}
+A Windows thread is seen as an executive thread object. This object is an encapsulation of the ETHREAD structure it represents. A parallel structure is on hand for each thread, these are called \texttt{CSR\_PROCESS}. If a thread need a Windows subsystem they have a W32THREAD structure instead. Each of these threads matches with its corresponding process allowing them to run within those processes. This ensures proper execution of a process within Windows. To create a thread, first Windows checks the flags and creates a proper object structure. Next, the client ID and TEB address are stored. Next, A user-mode context is created as well as a suspended executive thread. After, an activation context is implemented and an activation stack pointer is saved if needed. Then, the thread will notify Windows of a new thread so the system can do startup. Next, thread ID and handle are returned to caller. Lastly, thread is resumed and executed\cite{2}.
+\subsection{FreeBSM Threads}
+
+Threading for FreeBSM was mentioned in the process section of the report. That section talks about threads having a set structure, this structure looks like the following\cite{1}:
+\begin{itemize}
+	\item Scheduling: Involves thread priority, mode, scheduling priority, CPU utilization, sleep time,flags, state, etc.
+	\item TSB: User and kernel mode execution states
+	\item Kernel stack: Stack for kernel is on a per-thread basis
+	\item Machine state: machine-dependent thread information
+\end{itemize}
+These threads go through a process of states once executed. The process is kernel-mode,user-mode, process structure, and memory resources. Threads can move from one state to the next until the complete and no longer change states.
+
+\subsection{Linux Threads}
+Within Linux there are no "threads" to a Linux operating system a thread is simply a process. There's no adjustment for scheduling, no unique structure nothing. Instead, processes are able to share with other processes in the form of a thread without the title. Because Linux can already share through processes there is not need nor a place for threads within this operating system\cite{7}.
+\subsection{Threads Conclusion}
+From the data collected I can see that FreeBSM and Windows are unique on even having threads. Since Linux is already simplified it has no need from threads and simply runs processes that act as threads. FreeBSM runs threads with special timing so it seems as if they are running concurrently. Windows has a very detailed very long process of running a thread which checks the threads data, states, and flags and runs a new thread to emulate concurrency and then executes the old thread. It would seem that Linux is the most efficient with threading because it needs non, but the timing of FreeBSM causes its threading process to be quick and secure.
+
+\section{CPU Timining}
+CPU timing is a big deal. We all know the feeling of a slow CPU that causes us to be enraged. The FreeBSM system uses a scheduler that utilizes context switching. What it does is if a thread must wait on something else to be executed it finds the next thread that can be executed. This allows the system to find what the first thread needs to be execute ready as well as pass a thread through the process to minimize the size of the thread queue\cite{1}. This allows the system to have a faux version of concurrency by finding a more efficient path. Linux uses a simple scheduler that is based on run queues. This scheduler simply waits for the next process in the queue and executes, if the process isn't ready to execute it continues to wait until it is. This is very simple but it does work, Linux has updated this scheduler on newer systems but the old scheduler is still on many systems\cite{8}. The Windows scheduler was mentioned before, it is based on the priority of the processes in the queue. Part of windows priority queue is time-based while the other part is not. Several background processes won't block the foreground processes allowing this algorithm to be more efficient\cite{2}.
+
+\section{Memory Management}
+Memory management is how operating systems organize their memory. This is done by allocating space for different processes and optimizing the performance of each operating system\cite{9}.
+\subsection{Windows Memory Management}
+Windows memory management is run by a several executive processes. There are 6 main routines for windows memory management, they are a balance set manager, a process/stack swapper, a modified page writer, a mapped page writer, a segment deference thread, and a zero page thread\cite{3}. Each of these threads are run concurrently as separate processes to ensure the system is executing all processes needed for memory management as efficiently as possible. Because these processes are all running at once they need to be synchronized to ensure they don't all effect memory at the same time. This synchronization happens only between certain processes such as system working sets, kernel memory pools, and physical memory lists. This is important so the memory structure doesn't become corrupted. Windows allows users to see the processes and how much memory is used by each using the Task manager which can be accessed from the Windows menus.
+Like many systems Windows allocated memory space and stores data uses page tables. These are divided into large and small tables, large tables allow for speedy address transforming when trying to find data within the table, small tables are slower but allow the system to be backwards comparable with older or like systems. If the system hardware has very large tables due to large amounts of RAM the Windows operating system will map these tables to the operating systems core instead of in external areas. This ensures these tables are still processed efficiently even though their size is vast.   
+\subsection{FreeBSD Memory Management}
+In FreeBSD each process has separate address spaces that are divided into 3 parts, text, data, and stack\cite{10}. Because the data and stack portions are readable and writable the stack section can expand automatically by the kernel, and the data section can expand and contract by utilizing system calls. When the processes are run it will look at the address space in a page table and attempt to execute the process which is very similar to what Windows does. Within Free BSD is an interface called mmap, which allows multiple processes to share a mapped file in their address space even if processes were entirely separate\cite{1}. This allows changes to one file to be made for all processes mapped to it and was implemented as a space constraint for computer memory. FreeBSD will use page queues to structure their look up tables and dynamically allocates these to ensure that there is space. However, FreeBSD is known for their modular approach to memory management. This type of approach allows memory management to happen without a bunch of processes that need to be executed. Because the code is hardware based and modular it allows this form of management to be used on other systems easily.
+\subsection{Linux Memory Management}
+Linux also uses virtual memory to optimize memory use within the operating system. Within Linux their memory management is a basic linked list. This linked list is made up of structs that contain memory with the same protection. If the list becomes too long it will divide into a tree to accommodate more pages within the structure. Linux too optimizes how to access processes using page tables (large page tables) and uses the Buddy algorithm for allocation and deallocation of their tables. A swapping system is used to replace unused pages and deallocate them to make space for new tables. Unlike some other operating systems Linux utilizes caches to swap pages and order incoming information efficiently. This ensure that the rewriting of pages is not a problem as well as keeps track of which pages are unneeded anymore and which have recently been used or accessed\cite{11}.
+\section{Overall Conclusion}
+From the research obtained for each of the sections, process, threads, CPU timing, I/O, and memory management, we can see many similarities between the three operating systems. With I/O we can see that all three treat I/O handling the same, Windows uses virtual files but still manages memory using a file system. In Memory management we can see that FreeBSD is the most efficient by creating their memory handler a modular system that deals with the low level hardware instead of jumping through process hoops like Windows or Linux. CPU timing is different for each operating system because they all use separate algorithms to ensure the CPU is working at max performance for that operating system, the reason that they can't all use the same algorithm is because the processes run very differently on each.  Processes are extremely complicated in Windows which runs them almost concurrently, where as many other operating systems use a priority queue to ensure that processes are run as efficiently as possible. Lastly threads, they are a huge deal for Windows but Linux doesn't even have them, it all depends on if you have a need for them and why that need exists. In all, I have learned that Windows is vastly different than other operating systems and extremely complicated in the way it does the simplest tasks. But Linux is the barebones simple of operating systems in the way it does it's tasks, FreeBSD is somewhere in the middle but closer to Linux than Windows, it's more sophisticated than Linux but easier to understand than Windows.
+
+
+\bibliographystyle{ieeetr}
+\bibliography{ref}
+
+\end{document}
